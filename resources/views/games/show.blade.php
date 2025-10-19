@@ -7,6 +7,10 @@
   </div>
 
   <div class="bg-white rounded-lg border p-4 mb-6">
+    @if($game->cover_url)
+      <img src="{{ $game->cover_url }}" alt="cover" class="mb-4 w-full max-h-80 object-cover rounded-md">
+    @endif
+
     <p><span class="font-semibold">Genre:</span> {{ $game->genre ?? '—' }}</p>
     <p><span class="font-semibold">Release Year:</span> {{ $game->release_year ?? '—' }}</p>
     <p class="mt-2 whitespace-pre-line">{{ $game->description ?? 'No description.' }}</p>

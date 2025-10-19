@@ -14,6 +14,7 @@
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
+          <th class="px-4 py-2 text-left text-sm font-semibold">Cover</th> {{-- ⬅ NEW --}}
           <th class="px-4 py-2 text-left text-sm font-semibold">Title</th>
           <th class="px-4 py-2 text-left text-sm font-semibold">Genre</th>
           <th class="px-4 py-2 text-left text-sm font-semibold">Year</th>
@@ -24,6 +25,13 @@
       <tbody class="divide-y divide-gray-100">
         @forelse($games as $g)
           <tr>
+            <td class="px-4 py-2">
+              @if($g->cover_url)
+                <img src="{{ $g->cover_url }}" alt="thumb" class="h-12 w-12 object-cover rounded-md border">
+              @else
+                <div class="h-12 w-12 rounded-md border flex items-center justify-center text-xs text-gray-500">No img</div>
+              @endif
+            </td>
             <td class="px-4 py-2">
               <a href="{{ route('games.show', $g) }}" class="text-indigo-600 hover:underline">{{ $g->title }}</a>
             </td>
@@ -43,7 +51,7 @@
             </td>
           </tr>
         @empty
-          <tr><td class="px-4 py-3" colspan="5">No games found.</td></tr>
+          <tr><td class="px-4 py-3" colspan="6">No games found.</td></tr>
         @endforelse
       </tbody>
     </table>

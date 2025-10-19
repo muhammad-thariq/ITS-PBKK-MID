@@ -3,7 +3,8 @@
 @section('content')
   <h1 class="text-2xl font-bold mb-4">Add Game</h1>
 
-  <form method="POST" action="{{ route('games.store') }}" class="space-y-4 bg-white p-4 rounded-lg border">
+  <form method="POST" action="{{ route('games.store') }}" enctype="multipart/form-data"
+        class="space-y-4 bg-white p-4 rounded-lg border">
     @csrf
 
     <div>
@@ -33,6 +34,14 @@
       <textarea name="description" rows="4"
         class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
       @error('description') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium">Cover Image (optional)</label>
+      <input type="file" name="cover" accept="image/*"
+             class="w-full rounded-md border-gray-300 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-600 file:px-3 file:py-2 file:text-white hover:file:bg-indigo-700">
+      @error('cover') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+      <p class="text-xs text-gray-500 mt-1">JPG/PNG/WebP up to 2MB.</p>
     </div>
 
     <div class="flex gap-2">

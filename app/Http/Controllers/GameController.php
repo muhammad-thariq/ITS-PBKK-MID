@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // ⬅ NEW
 
 class GameController extends Controller
 {
@@ -32,7 +33,13 @@ class GameController extends Controller
             'genre'        => ['nullable', 'string', 'max:100'],
             'release_year' => ['nullable', 'integer', 'between:1970,2100'],
             'description'  => ['nullable', 'string'],
+            'cover'        => ['nullable','image','max:2048'], // ⬅ NEW: up to 2MB
         ]);
+
+        // ⬅ NEW: store file to public disk (folder "games")
+        if ($request->hasFile('cover')) {
+            $data['cover_path'] = $request->file('cover')->store('games', 'public');
+        }
 
         Game::create($data);
 
@@ -57,15 +64,32 @@ class GameController extends Controller
             'genre'        => ['nullable', 'string', 'max:100'],
             'release_year' => ['nullable', 'integer', 'between:1970,2100'],
             'description'  => ['nullable', 'string'],
+            'cover'        => ['nullable','image','max:2048'], // ⬅ NEW
         ]);
 
+        $old = $game->cover_path;
+
+        if ($request->hasFile('cover')) {
+            $data['cover_path'] = $request->file('cover')->store('games', 'public');
+        }
+
         $game->update($data);
+
+        // ⬅ NEW: if replaced, delete old file
+        if (!empty($data['cover_path']) && $old && $old !== $data['cover_path']) {
+            Storage::disk('public')->delete($old);
+        }
 
         return redirect()->route('games.show', $game)->with('ok', 'Game updated.');
     }
 
     public function destroy(Game $game)
     {
+        // ⬅ NEW: remove file when deleting game
+        if ($game->cover_path) {
+            Storage::disk('public')->delete($game->cover_path);
+        }
+        
         $game->delete();
         return redirect()->route('games.index')->with('ok', 'Game deleted.');
     }
