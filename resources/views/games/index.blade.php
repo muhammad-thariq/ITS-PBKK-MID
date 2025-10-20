@@ -1,61 +1,36 @@
-@extends('layout')
+<x-app-layout>
 
-@section('content')
-  <h1 class="text-2xl font-bold mb-4">Games</h1>
+  <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-8">
 
-  <!-- Search form (GET) -->
-  <form method="GET" action="{{ route('games.index') }}" class="mb-4 flex gap-2">
-    <input type="text" name="q" value="{{ $q }}" placeholder="Search by title..."
-           class="w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-    <button class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100">Search</button>
-  </form>
+    <div class="flex flex-col md:flex-row my-9 items-start md:items-center justify-between px-6">
+      <h2 class="text-white text-3xl font-semibold mb-4 md:mb-0">List Products</h2>
+    
+      <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+        <a href="{{ route('games.create') }}" class="w-full md:w-auto">
+          <button class="bg-white px-10 py-2 rounded-md font-semibold hover:bg-black hover:text-white hover:outline-none hover:ring-2 hover:ring-white hover:ring-offset-2 transition ease-in-out duration-150 w-full md:w-auto text-center">+ Add</button>
+        </a>
+      </div>
+      
+    </div>
 
-  <div class="bg-white rounded-lg border">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Cover</th> {{-- ⬅ NEW --}}
-          <th class="px-4 py-2 text-left text-sm font-semibold">Title</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Genre</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Year</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Avg Rating</th>
-          <th class="px-4 py-2"></th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-100">
-        @forelse($games as $g)
-          <tr>
-            <td class="px-4 py-2">
-              @if($g->cover_url)
-                <img src="{{ $g->cover_url }}" alt="thumb" class="h-12 w-12 object-cover rounded-md border">
-              @else
-                <div class="h-12 w-12 rounded-md border flex items-center justify-center text-xs text-gray-500">No img</div>
-              @endif
-            </td>
-            <td class="px-4 py-2">
-              <a href="{{ route('games.show', $g) }}" class="text-indigo-600 hover:underline">{{ $g->title }}</a>
-            </td>
-            <td class="px-4 py-2">{{ $g->genre ?? '—' }}</td>
-            <td class="px-4 py-2">{{ $g->release_year ?? '—' }}</td>
-            <td class="px-4 py-2">
-              @php $avg = $g->reviews->count() ? round($g->reviews->avg('rating'),1) : null; @endphp
-              {{ $avg ?? '—' }}
-            </td>
-            <td class="px-4 py-2 text-right">
-              <a href="{{ route('games.edit', $g) }}" class="px-3 py-1 rounded-md border hover:bg-gray-100">Edit</a>
-              <form action="{{ route('games.destroy',$g) }}" method="POST" class="inline">
-                @csrf @method('DELETE')
-                <button onclick="return confirm('Delete this game?')"
-                        class="px-3 py-1 rounded-md border hover:bg-gray-100">Delete</button>
-              </form>
-            </td>
-          </tr>
-        @empty
-          <tr><td class="px-4 py-3" colspan="6">No games found.</td></tr>
-        @endforelse
-      </tbody>
-    </table>
-  </div>
+    <div class="grid md:grid-cols-3 grid-cols-1 mt-4 gap-6 px-6">  
+      @foreach($games as $game)
+      <div>
+        <img src="{{ $game->cover_url }}" class="rounded-md w-[390px] h-[390px] object-cover">
 
-  <div class="mt-4">{{ $games->links() }}</div>
-@endsection
+        <div class="my-2">
+          <p class="text-xl text-white font-semibold">
+            {{ $game->title}}
+          </p>
+          <p class="text-gray-400">
+            Rp. {{ number_format($game->Price)}}
+          </p>
+          <a href="{{ route('games.show', $game) }}">
+            <button class="bg-white px-10 py-2 w-full rounded-md font-semibold my-4 hover:bg-black hover:text-white  hover:outline-none hover:ring-2 hover:ring-white hover:ring-offset-2 transition ease-in-out duration-150">Edit products</button>
+          </a>
+        </div>
+      </div>
+      @endforeach
+    </div>
+
+</x-app-layout>
