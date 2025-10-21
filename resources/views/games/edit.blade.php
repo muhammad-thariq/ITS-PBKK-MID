@@ -1,15 +1,15 @@
-{{-- resources/views/games/create.blade.php --}}
+{{-- resources/views/games/edit.blade.php --}}
 <x-app-layout>
   <div class="max-w-7xl mx-auto px-8">
     {{-- Header --}}
     <div class="flex flex-col md:flex-row my-9 items-start md:items-center justify-between px-6">
       <h2 class="text-white text-3xl font-semibold mb-4 md:mb-0">
-        Create Game
+        Edit: {{ $game->title }}
       </h2>
 
       <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-        {{-- Back to List --}}
-        <a href="{{ route('games.index') }}" class="w-full md:w-auto">
+        {{-- Back to Game --}}
+        <a href="{{ route('games.show', $game) }}" class="w-full md:w-auto">
           <button class="w-full md:w-auto bg-white px-6 py-2 rounded-md font-semibold hover:bg-black hover:text-white hover:ring-2 hover:ring-white hover:ring-offset-2 transition">
             ← Back
           </button>
@@ -22,17 +22,21 @@
       {{-- Left: Cover Preview (square) --}}
       <div class="w-full">
         <div class="w-full aspect-square rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
-          <img id="coverPreview" src="" alt="Cover preview" class="hidden w-full h-full object-cover">
-          <span id="noImageLabel" class="text-gray-400">No Image</span>
+          @if($game->cover_url)
+            <img id="coverPreview" src="{{ $game->cover_url }}" alt="{{ $game->title }} cover" class="w-full h-full object-cover">
+          @else
+            <img id="coverPreview" src="" alt="No cover" class="hidden w-full h-full object-cover">
+            <span id="noImageLabel" class="text-gray-400">No Image</span>
+          @endif
         </div>
       </div>
 
-      {{-- Right: Card with form (same style as edit) --}}
+      {{-- Right: Card with form (re-using the same style) --}}
       <div class="w-full lg:mt-0">
         <div class="w-full lg:aspect-square">
           <div class="h-full rounded-xl bg-black p-[2px]">
             <div class="h-full bg-white rounded-lg p-6 shadow-sm flex flex-col overflow-hidden">
-              <h3 class="text-lg font-semibold text-gray-900 shrink-0">Add Game</h3>
+              <h3 class="text-lg font-semibold text-gray-900 shrink-0">Edit Game</h3>
 
               {{-- Validation errors --}}
               @if ($errors->any())
@@ -46,12 +50,13 @@
               @endif
 
               <form
-                action="{{ route('games.store') }}"
+                action="{{ route('games.update', $game) }}"
                 method="POST"
                 enctype="multipart/form-data"
                 class="mt-4 space-y-4 grow overflow-auto pr-1"
               >
                 @csrf
+                @method('PATCH')
 
                 <div>
                   <label for="title" class="block text-sm font-medium text-gray-900">Title</label>
@@ -60,7 +65,7 @@
                     name="title"
                     type="text"
                     required
-                    value="{{ old('title') }}"
+                    value="{{ old('title', $game->title) }}"
                     class="mt-1 w-full rounded-md border border-black bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                   />
                 </div>
@@ -72,7 +77,7 @@
                       id="genre"
                       name="genre"
                       type="text"
-                      value="{{ old('genre') }}"
+                      value="{{ old('genre', $game->genre) }}"
                       class="mt-1 w-full rounded-md border border-black bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                     />
                   </div>
@@ -87,7 +92,7 @@
                       min="1950"
                       max="{{ now()->year }}"
                       step="1"
-                      value="{{ old('release_year') }}"
+                      value="{{ old('release_year', $game->release_year) }}"
                       class="mt-1 w-full rounded-md border border-black bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
                     />
                   </div>
@@ -100,7 +105,7 @@
                     name="description"
                     rows="5"
                     class="mt-1 w-full rounded-md border border-black bg-white px-3 py-2 leading-relaxed focus:outline-none focus:ring-2 focus:ring-black"
-                  >{{ old('description') }}</textarea>
+                  >{{ old('description', $game->description) }}</textarea>
                 </div>
 
                 <div>
@@ -120,10 +125,10 @@
                     type="submit"
                     class="bg-black text-white px-6 py-2 rounded-md font-semibold hover:bg-white hover:text-black hover:ring-2 hover:ring-black hover:ring-offset-2 transition"
                   >
-                    Create Game
+                    Save Changes
                   </button>
 
-                  <a href="{{ route('games.index') }}" class="text-sm underline text-gray-700 hover:text-black">
+                  <a href="{{ route('games.show', $game) }}" class="text-sm underline text-gray-700 hover:text-black">
                     Cancel
                   </a>
                 </div>
@@ -155,6 +160,7 @@
           }
           if (noImageLabel) noImageLabel.classList.add('hidden');
         } else {
+          // Reset preview if user clears selection
           if (preview) {
             preview.src = '';
             preview.classList.add('hidden');
